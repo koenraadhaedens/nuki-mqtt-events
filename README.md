@@ -6,7 +6,8 @@ It is designed to be installed and updated using HACS (Home Assistant Community 
 
 ## Features
 
-- Connects to an MQTT topic containing Nuki device payloads
+- Connects to the Nuki MQTT namespace automatically
+- Subscribes to MQTT events under the default `nuki/#` topic pattern
 - Parses Nuki event messages from the MQTT feed
 - Creates a Home Assistant state sensor for the current device state
 - Creates a battery sensor for the device battery percentage
@@ -53,8 +54,7 @@ The integration converts values such as:
 8. Click Install.
 9. Restart Home Assistant.
 10. Go to Settings > Devices & Services > Add Integration and search for `Nuki MQTT Events`.
-11. Enter the MQTT topic that contains your Nuki event payloads, for example:
-   - `nuki/event`
+11. The integration automatically subscribes to the Nuki MQTT namespace and does not require a manual topic entry.
 
 ## MQTT setup
 
@@ -62,7 +62,7 @@ This integration depends on the built-in Home Assistant MQTT integration.
 
 Before using it, make sure:
 - MQTT is enabled in Home Assistant
-- your Nuki bridge or MQTT broker is publishing messages to the configured topic
+- your Nuki bridge or MQTT broker is publishing messages under the Nuki MQTT namespace, typically `nuki/#`
 
 ## Example entity naming
 
