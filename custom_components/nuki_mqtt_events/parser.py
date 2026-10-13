@@ -120,7 +120,10 @@ def parse_nuki_event(raw: str | bytes | None) -> dict[str, object]:
         if not key:
             continue
 
-        parsed[key] = _coerce_value(value)
+        normalized_key = key
+        if key.lower() == "doorsensorbatterycritical":
+            normalized_key = "doorSensorBatteryCritical"
+        parsed[normalized_key] = _coerce_value(value)
 
     if device_id:
         parsed["device_id"] = device_id

@@ -9,10 +9,8 @@ It is designed to be installed and updated using HACS (Home Assistant Community 
 - Connects to the Nuki MQTT namespace automatically
 - Subscribes to MQTT events under the default `nuki/#` topic pattern
 - Parses Nuki event messages from the MQTT feed
-- Creates a Home Assistant state sensor for the current device state
-- Creates a battery sensor for the device battery percentage
-- Creates a connectivity binary sensor
-- Uses the device name from the MQTT payload when available
+- Creates sensors for state, device name, device type, last update, firmware, battery percentage, mode, and lock action event
+- Creates binary sensors for connectivity, battery critical, battery charging, keypad battery critical, and door-sensor battery critical
 
 ## Supported MQTT message format
 
@@ -64,13 +62,9 @@ Before using it, make sure:
 - MQTT is enabled in Home Assistant
 - your Nuki bridge or MQTT broker is publishing messages under the Nuki MQTT namespace, typically `nuki/#`
 
-## Example entity naming
+## Entities
 
-If the MQTT payload includes a device name such as `Backdoor`, the integration will create entities like:
-
-- `sensor.backdoor_state`
-- `sensor.backdoor_battery`
-- `binary_sensor.backdoor_connection`
+For the sample payload above, the integration creates 13 entities: eight sensors and five binary sensors. The `State` sensor maps the numeric Nuki `state` value to a readable state, while the other sensors expose their corresponding payload values. Each boolean field is available as its own binary sensor. The device name is exposed as the `Device name` sensor.
 
 ## Versioning
 
