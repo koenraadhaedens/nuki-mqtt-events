@@ -94,8 +94,10 @@ class NukiPayloadSensor(SensorEntity):
 
     async def _handle_mqtt_message(self, message) -> None:
         """Update this sensor from the latest payload."""
-        payload = parse_nuki_event(message.payload)
+        payload = parse_nuki_event(message.payload, message.topic)
         value = payload.get(self.entity_description.key)
+        if value is None or (self.entity_description.key == "event" and value == "unknown"):
+            return
         if self.entity_description.as_text and value is not None:
             value = ",".join(map(str, value)) if isinstance(value, list) else str(value)
         self._attr_native_value = value

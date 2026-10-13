@@ -14,7 +14,7 @@ It is designed to be installed and updated using HACS (Home Assistant Community 
 
 ## Supported MQTT message format
 
-This integration expects messages in the Nuki key/value format, for example:
+The integration supports a complete multiline Nuki key/value payload, as well as MQTT brokers that publish each field on its own topic (for example, `nuki/4CFF3164/connected` with payload `true`). Example complete payload:
 
 ```text
 ▼ 4CFF3164

@@ -104,7 +104,11 @@ class NukiPayloadBinarySensor(BinarySensorEntity):
 
     async def _handle_mqtt_message(self, message) -> None:
         """Update the binary sensor from the latest payload."""
-        payload = parse_nuki_event(message.payload)
+        payload = parse_nuki_event(message.payload, message.topic)
+        if self.entity_description.payload_key not in payload:
+            return
         value = payload.get(self.entity_description.payload_key)
-        self._attr_is_on = value if isinstance(value, bool) else None
+        if not isinstance(value, bool):
+            return
+        self._attr_is_on = value
         self.async_write_ha_state()

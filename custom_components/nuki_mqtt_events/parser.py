@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import re
+import json
 
 
 NukiStateNames = {
@@ -24,6 +25,22 @@ NukiDeviceTypes = {
     4: "smart_lock",
     5: "door",
     6: "door",
+}
+
+NukiFieldNames = {
+    "connected": "connected",
+    "timestamp": "timestamp",
+    "devicetype": "deviceType",
+    "name": "name",
+    "firmware": "firmware",
+    "batterychargestate": "batteryChargeState",
+    "batterycritical": "batteryCritical",
+    "batterycharging": "batteryCharging",
+    "keypadbatterycritical": "keypadBatteryCritical",
+    "doorsensorbatterycritical": "doorSensorBatteryCritical",
+    "state": "state",
+    "mode": "mode",
+    "lockactionevent": "lockActionEvent",
 }
 
 
@@ -78,17 +95,11 @@ def _state_from_payload(parsed: dict[str, object]) -> str:
         if charge <= 10:
             return "battery_low"
 
-    if "name" in parsed:
-        return str(parsed["name"])
-
-    if "device_id" in parsed:
-        return str(parsed["device_id"])
-
     return "unknown"
 
 
-def parse_nuki_event(raw: str | bytes | None) -> dict[str, object]:
-    """Parse a raw Nuki MQTT payload into a structured dictionary."""
+def parse_nuki_event(raw: str | bytes | None, topic: str | None = None) -> dict[str, object]:
+    """Parse a multiline Nuki payload or an individual topic/value message."""
     if raw is None:
         return {"event": "unknown", "raw": ""}
 
@@ -99,31 +110,56 @@ def parse_nuki_event(raw: str | bytes | None) -> dict[str, object]:
     if not text:
         return {"event": "unknown", "raw": ""}
 
-    parsed: dict[str, object] = {"raw": text, "event": "unknown"}
+    parsed: dict[str, object] = {"raw": text}
     device_id = None
 
-    for line in text.splitlines():
-        line = line.strip()
-        if not line:
-            continue
+    # Some Nuki MQTT bridges publish one field per topic, e.g.
+    # nuki/4CFF3164/connected with payload "true". Recognize that shape.
+    if topic:
+        topic_parts = [part for part in topic.strip("/").split("/") if part]
+        if topic_parts:
+            topic_key = NukiFieldNames.get(topic_parts[-1].lower())
+            if topic_key:
+                parsed[topic_key] = _coerce_value(text)
+                if len(topic_parts) > 1:
+                    candidate_id = topic_parts[-2]
+                    if candidate_id.lower() not in NukiFieldNames:
+                        device_id = candidate_id
+            elif len(topic_parts) > 1 and re.fullmatch(r"[A-Fa-f0-9]{6,}", topic_parts[-1]):
+                # Some brokers publish one JSON object on nuki/<device-id>.
+                device_id = topic_parts[-1]
 
-        if line.startswith("▼"):
-            match = re.search(r"▼\s*([A-Fa-f0-9]+)", line)
-            if match:
-                device_id = match.group(1)
-            continue
+    try:
+        json_payload = json.loads(text)
+    except json.JSONDecodeError:
+        json_payload = None
 
-        if "=" not in line:
-            continue
+    if isinstance(json_payload, dict):
+        for key, value in json_payload.items():
+            normalized_key = NukiFieldNames.get(str(key).lower(), str(key))
+            parsed[normalized_key] = value
 
-        key, value = [part.strip() for part in line.split("=", 1)]
-        if not key:
-            continue
+    elif not parsed.keys() - {"raw"}:
+        for line in text.splitlines():
+            line = line.strip()
+            if not line:
+                continue
 
-        normalized_key = key
-        if key.lower() == "doorsensorbatterycritical":
-            normalized_key = "doorSensorBatteryCritical"
-        parsed[normalized_key] = _coerce_value(value)
+            if line.startswith("▼"):
+                match = re.search(r"▼\s*([A-Fa-f0-9]+)", line)
+                if match:
+                    device_id = match.group(1)
+                continue
+
+            if "=" not in line:
+                continue
+
+            key, value = [part.strip() for part in line.split("=", 1)]
+            if not key:
+                continue
+
+            normalized_key = NukiFieldNames.get(key.lower(), key)
+            parsed[normalized_key] = _coerce_value(value)
 
     if device_id:
         parsed["device_id"] = device_id

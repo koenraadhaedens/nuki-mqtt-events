@@ -4,6 +4,12 @@ All notable changes to this project will be documented in this file.
 
 The format is based on Keep a Changelog, and this project adheres to semantic versioning.
 
+## [0.2.1] - 2026-10-13
+
+### Fixed
+- Parse individual MQTT field topics as well as multiline key/value payloads.
+- Keep entity values when MQTT messages update unrelated fields instead of replacing them with unknown/unavailable values.
+
 ## [0.2.0] - 2026-10-13
 
 ### Added
