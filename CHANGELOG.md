@@ -4,7 +4,7 @@ All notable changes to this project will be documented in this file.
 
 The format is based on Keep a Changelog, and this project adheres to semantic versioning.
 
-## [0.2.0] - Unreleased
+## [0.2.0] - 2026-10-13
 
 ### Added
 - Separate entities for every field in the Nuki MQTT payload, including firmware, timestamp, device name/type, mode, and lock action event.
