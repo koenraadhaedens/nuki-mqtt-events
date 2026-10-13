@@ -1,0 +1,19 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Nuki MQTT Events instellen",
+        "description": "Kies het MQTT-topic dat Nuki-events bevat.",
+        "data": {
+          "topic": "MQTT-topic"
+        }
+      }
+    },
+    "error": {
+      "invalid_topic": "Het MQTT-topic is ongeldig."
+    },
+    "abort": {
+      "already_configured": "Deze integratie is al geconfigureerd."
+    }
+  }
+}

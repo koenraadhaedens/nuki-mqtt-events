@@ -1,0 +1,7 @@
+{
+  "name": "Nuki MQTT Events",
+  "filename": "nuki_mqtt_events.zip",
+  "homeassistant": "2024.1.0",
+  "render_readme": true,
+  "hide_default_branch": true
+}
