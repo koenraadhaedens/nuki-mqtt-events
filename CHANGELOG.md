@@ -4,6 +4,12 @@ All notable changes to this project will be documented in this file.
 
 The format is based on Keep a Changelog, and this project adheres to semantic versioning.
 
+## [0.4.2] - 2026-10-14
+
+### Fixed
+- Order Home Assistant manifest keys for hassfest validation.
+- Add the repository description and topics required for HACS default inclusion.
+
 ## [0.4.1] - 2026-10-14
 
 ### Added
