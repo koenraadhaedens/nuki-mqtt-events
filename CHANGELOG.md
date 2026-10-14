@@ -4,6 +4,11 @@ All notable changes to this project will be documented in this file.
 
 The format is based on Keep a Changelog, and this project adheres to semantic versioning.
 
+## [0.4.1] - 2026-10-14
+
+### Added
+- Add a local Home Assistant brand icon for the integration.
+
 ## [0.4.0] - 2026-10-13
 
 ### Added
