@@ -4,6 +4,12 @@ Nuki MQTT Events is a Home Assistant custom integration for exposing Nuki device
 
 It is designed to be installed and updated using HACS (Home Assistant Community Store) from a custom repository.
 
+> [!NOTE]
+> This integration is not affiliated with or endorsed by Nuki. It is an independent, community-backed project based on publicly available documentation and APIs.
+
+> [!NOTE]
+> **Disclaimer:** This project was created primarily with the assistance of AI. It has been reviewed and tested by a professional programmer, but this disclosure is provided for transparency.
+
 ## Features
 
 - Connects to the Nuki MQTT namespace automatically
