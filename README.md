@@ -2,26 +2,48 @@
 
 Nuki MQTT Events is a Home Assistant custom integration for exposing Nuki device events received over MQTT as Home Assistant entities.
 
-It is designed to be installed and updated using HACS (Home Assistant Community Store) from a custom repository.
+It is designed to be installed and updated through the Home Assistant Community Store (HACS) as a custom repository.
 
 > [!NOTE]
 > This integration is not affiliated with or endorsed by Nuki. It is an independent, community-backed project based on publicly available documentation and APIs.
 
-> [!NOTE]
-> **Disclaimer:** This project was created primarily with the assistance of AI. It has been reviewed and tested by a professional programmer, but this disclosure is provided for transparency.
+> [!IMPORTANT]
+> This project was created primarily with the assistance of AI. It has been reviewed and tested by a professional programmer, but this disclosure is provided for transparency.
 
 ## Features
 
-- Connects to the Nuki MQTT namespace automatically
-- Subscribes to MQTT events under the default `nuki/#` topic pattern
-- Parses Nuki event messages from the MQTT feed
-- Creates sensors for state, device name, device type, last update, firmware, battery percentage, mode, raw lock action event, and a readable last action
+- Automatically subscribes to the default `nuki/#` MQTT topic pattern
+- Supports complete multiline payloads and values published on individual topics
+- Creates sensors for state, device name, device type, last update, firmware, battery percentage, mode, raw lock action event, and readable last action
 - Creates binary sensors for connectivity, battery critical, battery charging, keypad battery critical, and door-sensor battery critical
-- Creates an independent entity set for every Nuki device found under the subscribed topic
+- Creates an independent Home Assistant device and entity set for every Nuki device
 
-## Supported MQTT message format
+## Prerequisites
 
-The integration supports a complete multiline Nuki key/value payload, as well as MQTT brokers that publish each field on its own topic (for example, `nuki/4CFF3164/connected` with payload `true`). Example complete payload:
+Before installing the integration:
+
+1. Configure the built-in [Home Assistant MQTT integration](https://www.home-assistant.io/integrations/mqtt/).
+2. Enable MQTT for your Nuki device in the Nuki app.
+3. Confirm that your Nuki bridge or MQTT broker publishes messages under the Nuki MQTT namespace, typically `nuki/#`.
+
+## Installation with HACS
+
+1. Open **HACS** in Home Assistant.
+2. Select the three-dot menu and choose **Custom repositories**.
+3. Enter `https://github.com/koenraadhaedens/nuki-mqtt-events` as the repository.
+4. Select **Integration** as the category, then click **Add**.
+5. In **HACS > Integrations**, search for **Nuki MQTT Events** and install it.
+6. Restart Home Assistant.
+7. Go to **Settings > Devices & services** and click **Add integration**.
+8. Search for **Nuki MQTT Events** and complete the setup.
+
+The integration automatically subscribes to the Nuki MQTT namespace; no manual topic entry is required.
+
+## Supported MQTT message formats
+
+The integration supports complete multiline Nuki key/value payloads and brokers that publish each field on its own topic, such as `nuki/4CFF3164/connected` with the payload `true`.
+
+Example complete payload:
 
 ```text
 ▼ 4CFF3164
@@ -40,52 +62,24 @@ mode = 2
 lockActionEvent = 0,0,87501,8192,1
 ```
 
-The integration converts values such as:
+The integration:
+
 - `true` / `false` to boolean values
-- numeric values to integers/floats
-- `state` to a HA-friendly state like `locked`, `unlocked`, `unlatched`, or `disconnected`
-- `lockActionEvent` to a readable value such as `Unlock by Koenraad via app` or `Unlock by Koenraad via keypad`
+- converts numeric values to integers or floating-point numbers
+- maps `state` to a Home Assistant-friendly value such as `locked`, `unlocked`, `unlatched`, or `disconnected`
+- decodes `lockActionEvent` into a readable value such as `Unlock by Koenraad via app` or `Unlock by Koenraad via keypad`
 
-## Prerequisites
+## Naming app and keypad users
 
-Before installing the integration, enable MQTT for your Nuki device in the Nuki app.
+The `lockActionEvent` payload uses the format `action,trigger,authorization ID,code ID,detail`. App users normally use the authorization ID, while keypad users use the code ID.
 
-## Installation in Home Assistant with HACS
-
-1. Open Home Assistant.
-2. Go to Settings > Devices & Services > Helpers or simply open the HACS integration.
-3. In HACS, click the three-dot menu and choose Custom repositories.
-4. Add the repository as follows:
-   - Repository: `koenraadhaedens/nuki-mqtt-events`
-   - Category: `Integration`
-5. Click Add.
-6. Open HACS > Integrations.
-7. Search for `Nuki MQTT Events`.
-8. Click Install.
-9. Restart Home Assistant.
-10. Go to Settings > Devices & Services > Add Integration and search for `Nuki MQTT Events`.
-11. The integration automatically subscribes to the Nuki MQTT namespace and does not require a manual topic entry.
-
-## MQTT setup
-
-This integration depends on the built-in Home Assistant MQTT integration.
-
-Before using it, make sure:
-- MQTT is enabled in Home Assistant
-- your Nuki bridge or MQTT broker is publishing messages under the Nuki MQTT namespace, typically `nuki/#`
-
-### Naming app and keypad users
-
-The `lockActionEvent` payload is `action,trigger,authorization ID,code ID,detail`.
-App users normally use the authorization ID, while keypad users use the code ID.
-Keep the mappings in a dedicated file by adding this to `configuration.yaml`:
+To map these IDs to names, add the following to your Home Assistant `configuration.yaml`:
 
 ```yaml
 nuki_mqtt_events: !include nuki_mqtt_events.yaml
 ```
 
-Then create `nuki_mqtt_events.yaml` in the same Home Assistant configuration
-directory. You can add as many authorization IDs and code IDs as needed:
+Create `nuki_mqtt_events.yaml` in the same directory:
 
 ```yaml
 authorization_names:
@@ -99,25 +93,27 @@ code_names:
   "8194": Cleaner
 ```
 
-Restart Home Assistant after changing these mappings. Trigger the lock once and inspect
-the `authorization_id` and `code_id` attributes of the `Last action` sensor to discover
-the IDs. The sensor also exposes the decoded action, trigger, source, and keypad input
-type as attributes.
+Add as many authorization and code IDs as needed, then restart Home Assistant. To discover the IDs, trigger the lock once and inspect the `authorization_id` and `code_id` attributes of the **Last action** sensor. This sensor also exposes the decoded action, trigger, source, and keypad input type as attributes.
+
+An example configuration is available in [`examples/nuki_mqtt_events.yaml`](examples/nuki_mqtt_events.yaml).
 
 ## Entities
 
-For the sample payload above, the integration creates up to 14 entities: nine sensors and five binary sensors. Entities are created when their values are first published. The `State` sensor maps the numeric Nuki `state` value to a readable state, while `Last action` decodes the five-part `lockActionEvent`. The raw event remains available as `Lock action event`. Each boolean field is available as its own binary sensor. The device name is exposed as the `Device name` sensor.
+For the sample payload above, the integration creates up to 14 entities: nine sensors and five binary sensors. Entities are created when their values are first published.
 
-Each Nuki device gets its own Home Assistant device and entity set. Entity names use the `name` value from the MQTT payload when available, such as `Backdoor State`. Until a name is received, the integration uses the device segment of the MQTT topic, such as `4CFF3164 State`. This prevents messages from multiple Nuki devices under `nuki/#` from overwriting one another.
+![Nuki MQTT Events entities in Home Assistant](custom_components/nuki_mqtt_events/images/Screenshot-nuki-mqtt-events.png)
+
+- **State** maps the numeric Nuki `state` value to a readable state.
+- **Last action** decodes the five-part `lockActionEvent`.
+- **Lock action event** retains the raw event.
+- **Device name** exposes the name reported by Nuki.
+- Each boolean field is available as its own binary sensor.
+
+Each Nuki device gets its own Home Assistant device and entity set. Entity names use the `name` value from the MQTT payload when available, such as `Backdoor State`. Until a name is received, the integration uses the device segment of the MQTT topic, such as `4CFF3164 State`. This prevents messages from multiple Nuki devices from overwriting one another.
 
 ## Versioning
 
-This project follows semantic versioning:
-
-- `MAJOR.MINOR.PATCH`
-- Example: `0.1.0`
-
-The project uses GitHub Releases for published builds.
+This project follows [semantic versioning](https://semver.org/) (`MAJOR.MINOR.PATCH`) and uses GitHub Releases for published builds.
 
 ## License
 
