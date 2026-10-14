@@ -2,15 +2,47 @@
 
 from __future__ import annotations
 
+import voluptuous as vol
+
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
+from homeassistant.helpers import config_validation as cv
 from homeassistant.helpers.typing import ConfigType
 
-from .const import DOMAIN, PLATFORMS
+from .const import (
+    CONF_AUTHORIZATION_NAMES,
+    CONF_CODE_NAMES,
+    DATA_AUTHORIZATION_NAMES,
+    DATA_CODE_NAMES,
+    DOMAIN,
+    PLATFORMS,
+)
+
+CONFIG_SCHEMA = vol.Schema(
+    {
+        vol.Optional(DOMAIN): vol.Schema(
+            {
+                vol.Optional(CONF_AUTHORIZATION_NAMES, default={}): {
+                    vol.Coerce(str): cv.string
+                },
+                vol.Optional(CONF_CODE_NAMES, default={}): {
+                    vol.Coerce(str): cv.string
+                },
+            }
+        )
+    },
+    extra=vol.ALLOW_EXTRA,
+)
 
 
 async def async_setup(hass: HomeAssistant, config: ConfigType) -> bool:
     """Set up the integration from YAML configuration."""
+    domain_data = hass.data.setdefault(DOMAIN, {})
+    yaml_config = config.get(DOMAIN, {})
+    domain_data[DATA_AUTHORIZATION_NAMES] = dict(
+        yaml_config.get(CONF_AUTHORIZATION_NAMES, {})
+    )
+    domain_data[DATA_CODE_NAMES] = dict(yaml_config.get(CONF_CODE_NAMES, {}))
     return True
 
 

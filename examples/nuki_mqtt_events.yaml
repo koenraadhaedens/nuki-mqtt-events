@@ -1,0 +1,10 @@
+# Include this file from configuration.yaml with:
+# nuki_mqtt_events: !include nuki_mqtt_events.yaml
+
+authorization_names:
+  "87501": Koenraad
+  "87502": Alice
+
+code_names:
+  "8192": Koenraad
+  "8193": Alice

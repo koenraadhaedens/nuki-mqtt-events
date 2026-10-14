@@ -4,7 +4,12 @@ DOMAIN = "nuki_mqtt_events"
 PLATFORMS = ["sensor", "binary_sensor"]
 
 CONF_TOPIC = "topic"
+CONF_AUTHORIZATION_NAMES = "authorization_names"
+CONF_CODE_NAMES = "code_names"
 DEFAULT_TOPIC = "nuki/#"
+
+DATA_AUTHORIZATION_NAMES = "authorization_names"
+DATA_CODE_NAMES = "code_names"
 
 ATTR_DEVICE_ID = "device_id"
 ATTR_NAME = "name"

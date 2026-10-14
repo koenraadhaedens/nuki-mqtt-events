@@ -1,7 +1,7 @@
 {
   "domain": "nuki_mqtt_events",
   "name": "Nuki MQTT Events",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "documentation": "https://github.com/koenraadhaedens/nuki-mqtt-events/blob/main/README.md",
   "issue_tracker": "https://github.com/koenraadhaedens/nuki-mqtt-events/issues",
   "codeowners": ["@koenraadhaedens"],

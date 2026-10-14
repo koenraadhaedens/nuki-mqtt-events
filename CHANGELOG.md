@@ -4,6 +4,12 @@ All notable changes to this project will be documented in this file.
 
 The format is based on Keep a Changelog, and this project adheres to semantic versioning.
 
+## [0.4.0] - 2026-10-13
+
+### Added
+- Decode `lockActionEvent` into a readable `Last action` sensor with event details as attributes.
+- Support YAML mappings from Nuki authorization and keypad code IDs to user names.
+
 ## [0.3.0] - 2026-10-13
 
 ### Added

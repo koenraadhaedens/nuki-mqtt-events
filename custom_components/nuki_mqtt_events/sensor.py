@@ -15,8 +15,19 @@ from homeassistant.core import HomeAssistant
 from homeassistant.helpers.device_registry import DeviceInfo
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 
-from .const import CONF_TOPIC, DEFAULT_TOPIC, DOMAIN
-from .parser import device_key, device_label, parse_nuki_event
+from .const import (
+    CONF_TOPIC,
+    DATA_AUTHORIZATION_NAMES,
+    DATA_CODE_NAMES,
+    DEFAULT_TOPIC,
+    DOMAIN,
+)
+from .parser import (
+    device_key,
+    device_label,
+    parse_lock_action_event,
+    parse_nuki_event,
+)
 
 
 @dataclass(frozen=True)
@@ -47,6 +58,9 @@ SENSORS = (
     NukiSensorDescription(
         key="lockActionEvent", name="Lock action event", icon="mdi:lock-clock", as_text=True
     ),
+    NukiSensorDescription(
+        key="lockActionSummary", name="Last action", icon="mdi:account-lock", as_text=True
+    ),
 )
 
 
@@ -57,7 +71,13 @@ async def async_setup_entry(
 ) -> None:
     """Set up Nuki payload sensors as devices publish values."""
     topic = config_entry.data.get(CONF_TOPIC, DEFAULT_TOPIC)
-    manager = NukiSensorManager(config_entry.entry_id, async_add_entities)
+    domain_data = hass.data.setdefault(DOMAIN, {})
+    manager = NukiSensorManager(
+        config_entry.entry_id,
+        async_add_entities,
+        domain_data.get(DATA_AUTHORIZATION_NAMES, {}),
+        domain_data.get(DATA_CODE_NAMES, {}),
+    )
     unsubscribe = await mqtt.async_subscribe(
         hass,
         topic,
@@ -74,10 +94,14 @@ class NukiSensorManager:
         self,
         entry_id: str,
         async_add_entities: AddEntitiesCallback,
+        authorization_names: dict[str, str],
+        code_names: dict[str, str],
     ) -> None:
         """Initialize the sensor manager."""
         self._entry_id = entry_id
         self._async_add_entities = async_add_entities
+        self._authorization_names = authorization_names
+        self._code_names = code_names
         self._entities: dict[tuple[str, str], NukiPayloadSensor] = {}
         self._labels: dict[str, str] = {}
 
@@ -85,6 +109,14 @@ class NukiSensorManager:
         """Route an MQTT message to the matching device sensors."""
         payload = parse_nuki_event(message.payload, message.topic)
         key = device_key(payload, message.topic)
+        lock_action = parse_lock_action_event(
+            payload.get("lockActionEvent"),
+            self._authorization_names,
+            self._code_names,
+        )
+        if lock_action is not None:
+            payload["lockActionSummary"] = lock_action["summary"]
+            payload["lockActionDetails"] = lock_action
 
         name = payload.get("name")
         if isinstance(name, str) and name.strip():
@@ -176,7 +208,16 @@ class NukiPayloadSensor(SensorEntity):
         self._attr_extra_state_attributes = (
             {"nuki_state_code": payload.get("state")}
             if self.entity_description.key == "event"
-            else {}
+            else {
+                key: attribute
+                for key, attribute in (
+                    payload.get("lockActionDetails", {}).items()
+                    if self.entity_description.key == "lockActionSummary"
+                    and isinstance(payload.get("lockActionDetails"), dict)
+                    else ()
+                )
+                if key != "summary" and attribute is not None
+            }
         )
         if write_state:
             self.async_write_ha_state()

@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import re
 import json
+from collections.abc import Mapping
 
 
 NukiStateNames = {
@@ -41,6 +42,33 @@ NukiFieldNames = {
     "state": "state",
     "mode": "mode",
     "lockactionevent": "lockActionEvent",
+}
+
+NukiLockActions = {
+    1: "unlock",
+    2: "lock",
+    3: "unlatch",
+    4: "lock 'n' go",
+    5: "lock 'n' go and unlatch",
+    6: "full lock",
+    80: "fob (no action)",
+    90: "button (no action)",
+}
+
+NukiLockTriggers = {
+    0: "app",
+    1: "reserved",
+    2: "button",
+    3: "time control",
+    6: "auto lock",
+    171: "HomeKit",
+    172: "MQTT",
+}
+
+NukiKeypadSources = {
+    0: "back key",
+    1: "code",
+    2: "fingerprint",
 }
 
 
@@ -112,6 +140,63 @@ def _state_from_payload(parsed: dict[str, object]) -> str:
             return "battery_low"
 
     return "unknown"
+
+
+def parse_lock_action_event(
+    value: object,
+    authorization_names: Mapping[str, str] | None = None,
+    code_names: Mapping[str, str] | None = None,
+) -> dict[str, object] | None:
+    """Decode a Nuki lockActionEvent and create a readable summary."""
+    if isinstance(value, str):
+        parts = [part.strip() for part in value.split(",")]
+    elif isinstance(value, (list, tuple)):
+        parts = list(value)
+    else:
+        return None
+
+    if len(parts) != 5:
+        return None
+
+    try:
+        action, trigger, auth_id, code_id, detail = (int(part) for part in parts)
+    except (TypeError, ValueError):
+        return None
+
+    action_name = NukiLockActions.get(action, f"action {action}")
+    trigger_name = NukiLockTriggers.get(trigger, f"trigger {trigger}")
+    keypad_source = NukiKeypadSources.get(detail) if code_id > 0 else None
+    source = "keypad" if code_id > 0 else trigger_name
+
+    authorization_names = authorization_names or {}
+    code_names = code_names or {}
+    actor = (
+        code_names.get(str(code_id))
+        if code_id > 0
+        else authorization_names.get(str(auth_id))
+    )
+    if actor is None and auth_id > 0:
+        actor = authorization_names.get(str(auth_id))
+
+    summary = action_name.capitalize()
+    if actor:
+        summary += f" by {actor}"
+    summary += f" via {source}"
+
+    return {
+        "summary": summary,
+        "action_code": action,
+        "action": action_name,
+        "trigger_code": trigger,
+        "trigger": trigger_name,
+        "authorization_id": auth_id,
+        "authorization_name": authorization_names.get(str(auth_id)),
+        "code_id": code_id,
+        "code_name": code_names.get(str(code_id)),
+        "source": source,
+        "keypad_source": keypad_source,
+        "detail": detail,
+    }
 
 
 def parse_nuki_event(raw: str | bytes | None, topic: str | None = None) -> dict[str, object]:
