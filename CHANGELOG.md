@@ -4,6 +4,11 @@ All notable changes to this project will be documented in this file.
 
 The format is based on Keep a Changelog, and this project adheres to semantic versioning.
 
+## [0.4.3] - 2026-10-14
+
+### Changed
+- Update the integration icon for improved branding.
+
 ## [0.4.2] - 2026-10-14
 
 ### Fixed
