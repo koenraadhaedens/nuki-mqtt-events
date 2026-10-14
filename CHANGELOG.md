@@ -4,6 +4,12 @@ All notable changes to this project will be documented in this file.
 
 The format is based on Keep a Changelog, and this project adheres to semantic versioning.
 
+## [0.3.0] - 2026-10-13
+
+### Added
+- Create independent sensor and binary-sensor entities for every Nuki device under the configured MQTT topic.
+- Name each device's entities from the MQTT payload `name`, with the topic device segment as a fallback.
+
 ## [0.2.1] - 2026-10-13
 
 ### Fixed

@@ -53,6 +53,22 @@ def device_label(parsed: dict[str, object]) -> str:
     return "Nuki"
 
 
+def device_key(parsed: dict[str, object], topic: str) -> str:
+    """Return a stable key that separates devices sharing a subscription."""
+    device_id = parsed.get("device_id")
+    if device_id is not None and str(device_id).strip():
+        return str(device_id).strip()
+
+    topic_parts = [part for part in topic.strip("/").split("/") if part]
+    if topic_parts:
+        return topic_parts[-1]
+
+    name = parsed.get("name")
+    if isinstance(name, str) and name.strip():
+        return name.strip()
+    return "nuki"
+
+
 def _coerce_value(value: str):
     """Convert a text value to a useful Python value."""
     cleaned = value.strip()
@@ -125,8 +141,8 @@ def parse_nuki_event(raw: str | bytes | None, topic: str | None = None) -> dict[
                     candidate_id = topic_parts[-2]
                     if candidate_id.lower() not in NukiFieldNames:
                         device_id = candidate_id
-            elif len(topic_parts) > 1 and re.fullmatch(r"[A-Fa-f0-9]{6,}", topic_parts[-1]):
-                # Some brokers publish one JSON object on nuki/<device-id>.
+            elif len(topic_parts) > 1:
+                # Some brokers publish one complete payload on nuki/<device-id>.
                 device_id = topic_parts[-1]
 
     try:

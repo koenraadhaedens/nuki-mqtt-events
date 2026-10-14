@@ -11,6 +11,7 @@ It is designed to be installed and updated using HACS (Home Assistant Community 
 - Parses Nuki event messages from the MQTT feed
 - Creates sensors for state, device name, device type, last update, firmware, battery percentage, mode, and lock action event
 - Creates binary sensors for connectivity, battery critical, battery charging, keypad battery critical, and door-sensor battery critical
+- Creates an independent entity set for every Nuki device found under the subscribed topic
 
 ## Supported MQTT message format
 
@@ -64,7 +65,9 @@ Before using it, make sure:
 
 ## Entities
 
-For the sample payload above, the integration creates 13 entities: eight sensors and five binary sensors. The `State` sensor maps the numeric Nuki `state` value to a readable state, while the other sensors expose their corresponding payload values. Each boolean field is available as its own binary sensor. The device name is exposed as the `Device name` sensor.
+For the sample payload above, the integration creates up to 13 entities: eight sensors and five binary sensors. Entities are created when their values are first published. The `State` sensor maps the numeric Nuki `state` value to a readable state, while the other sensors expose their corresponding payload values. Each boolean field is available as its own binary sensor. The device name is exposed as the `Device name` sensor.
+
+Each Nuki device gets its own Home Assistant device and entity set. Entity names use the `name` value from the MQTT payload when available, such as `Backdoor State`. Until a name is received, the integration uses the device segment of the MQTT topic, such as `4CFF3164 State`. This prevents messages from multiple Nuki devices under `nuki/#` from overwriting one another.
 
 ## Versioning
 
