@@ -40,6 +40,10 @@ The integration converts values such as:
 - `state` to a HA-friendly state like `locked`, `unlocked`, `unlatched`, or `disconnected`
 - `lockActionEvent` to a readable value such as `Unlock by Koenraad via app` or `Unlock by Koenraad via keypad`
 
+## Prerequisites
+
+Before installing the integration, enable MQTT for your Nuki device in the Nuki app.
+
 ## Installation in Home Assistant with HACS
 
 1. Open Home Assistant.
