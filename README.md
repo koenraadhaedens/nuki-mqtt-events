@@ -1,6 +1,6 @@
 # Nuki MQTT Events
 
-Nuki MQTT Events is a Home Assistant custom integration for monitoring Nuki devices over MQTT and controlling supported locks with native Home Assistant lock/unlock controls.
+Take local control of your Nuki devices with Nuki MQTT Events, a Home Assistant custom integration that lets you monitor your devices and lock or unlock supported locks over local MQTT, with no external API needed.
 
 It is designed to be installed and updated through the Home Assistant Community Store (HACS) as a custom repository.
 
