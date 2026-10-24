@@ -6,7 +6,7 @@ You will still need the Nuki app to enable and configure MQTT on your device. On
 
 Once the integration is set up, you can also control supported locks remotely through the Home Assistant Companion app, provided remote access to your Home Assistant instance is configured.
 
-It is designed to be installed and updated through the Home Assistant Community Store (HACS) as a custom repository.
+It is available in the Home Assistant Community Store (HACS) and can be installed and updated directly through HACS.
 
 > [!NOTE]
 > This integration is not affiliated with or endorsed by Nuki. It is an independent, community-backed project based on publicly available documentation and APIs.
@@ -35,13 +35,10 @@ Before installing the integration:
 ## Installation with HACS
 
 1. Open **HACS** in Home Assistant.
-2. Select the three-dot menu and choose **Custom repositories**.
-3. Enter `https://github.com/koenraadhaedens/nuki-mqtt-events` as the repository.
-4. Select **Integration** as the category, then click **Add**.
-5. In **HACS > Integrations**, search for **Nuki MQTT Events** and install it.
-6. Restart Home Assistant.
-7. Go to **Settings > Devices & services** and click **Add integration**.
-8. Search for **Nuki MQTT Events** and complete the setup.
+2. Search for **Nuki MQTT Events** and download it.
+3. Restart Home Assistant.
+4. Go to **Settings > Devices & services** and click **Add integration**.
+5. Search for **Nuki MQTT Events** and complete the setup.
 
 The integration automatically subscribes to the Nuki MQTT namespace; no manual topic entry is required.
 Only one integration entry is allowed; it handles all Nuki devices. Adding it again
