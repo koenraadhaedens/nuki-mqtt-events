@@ -25,3 +25,4 @@ jobs:
         with:
           files: dist/nuki_mqtt_events.zip
           generate_release_notes: true
+          prerelease: ${{ contains(github.ref_name, '-') || contains(github.ref_name, 'a') || contains(github.ref_name, 'b') || contains(github.ref_name, 'rc') }}

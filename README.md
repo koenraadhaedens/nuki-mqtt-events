@@ -17,6 +17,7 @@ It is designed to be installed and updated through the Home Assistant Community 
 - Creates sensors for state, device name, device type, last update, firmware, battery percentage, mode, raw lock action event, and readable last action
 - Creates binary sensors for connectivity, battery critical, battery charging, keypad battery critical, and door-sensor battery critical
 - Creates an independent Home Assistant device and entity set for every Nuki device
+- Adds a lock entity with lock/unlock controls for devices publishing native Nuki MQTT state topics
 
 ## Prerequisites
 
@@ -99,9 +100,43 @@ Add as many authorization and code IDs as needed, then restart Home Assistant. T
 
 An example configuration is available in [`examples/nuki_mqtt_events.yaml`](examples/nuki_mqtt_events.yaml).
 
+## Lock and unlock control
+
+When a device publishes `state` on `nuki/<device-id>/state`, the integration
+creates a **Lock** entity on the same Home Assistant device as its sensors.
+Complete payloads on `nuki/<device-id>` are also supported, provided the publisher
+accepts native Nuki commands on `nuki/<device-id>/lockAction`.
+Read-only bridges or publishers using a different command API are not supported
+for control.
+
+Enable MQTT command access in the Nuki app (not just status reporting), and
+ensure the Home Assistant MQTT account can publish to the command topic.
+The entity provides Home Assistant's standard lock/unlock controls and actions:
+
+- **Lock** publishes `2` to `nuki/<device-id>/lockAction`.
+- **Unlock** publishes `1` to that topic. It does not send the separate unlatch command.
+
+Commands use QoS 0 and are **never retained**, so a new command is not stored
+for replay on reconnect. Adding the integration or restarting Home Assistant
+does not send commands. State only changes when Nuki reports it; publishing a
+command is not confirmation that it succeeded. If command access is disabled,
+the state may remain unchanged. Known device or broker disconnections make
+the entity unavailable and block commands.
+
+For a first test, keep another way to access the door available, restart Home
+Assistant after installing this branch, and wait for a state message to discover
+the lock entity. Test while physically near the lock. Do not enable automations
+until you have verified both controls and the reported state.
+
+State codes follow the [Nuki MQTT API](https://developer.nuki.io/t/mqtt-api-specification-v1-2/17283):
+`1` locked, `2` unlocking, `3` unlocked, `4` locking, `5` unlatched,
+`6` unlocked (Lock 'n' Go), `7` unlatching, and `254` motor blocked (jammed).
+Uncalibrated, startup, undefined, and unrecognized codes do not report a confirmed
+locked/unlocked state.
+
 ## Entities
 
-For the sample payload above, the integration creates up to 14 entities: nine sensors and five binary sensors. Entities are created when their values are first published.
+For the sample payload above, the integration creates up to 15 entities: nine sensors, five binary sensors, and one lock. Entities are created when their values are first published.
 
 ![Nuki MQTT Events entities in Home Assistant](custom_components/nuki_mqtt_events/images/Screenshot-nuki-mqtt-events.png)
 

@@ -45,5 +45,28 @@ class ParseLockActionEventTest(unittest.TestCase):
         self.assertIsNone(PARSER.parse_lock_action_event("1,2,user,4,5"))
 
 
+class ParseStateTest(unittest.TestCase):
+    """Keep sensor labels aligned with the native MQTT lock state codes."""
+
+    def test_native_state_labels(self) -> None:
+        for code, label in {
+            0: "uncalibrated",
+            1: "locked",
+            2: "unlocking",
+            3: "unlocked",
+            4: "locking",
+            5: "unlatched",
+            6: "unlocked_lock_n_go",
+            7: "unlatching",
+            253: "boot_run",
+            254: "motor_blocked",
+            255: "undefined",
+            999: "unknown",
+        }.items():
+            with self.subTest(code=code):
+                result = PARSER.parse_nuki_event(str(code), "nuki/ABC/state")
+                self.assertEqual(result["event"], label)
+
+
 if __name__ == "__main__":
     unittest.main()

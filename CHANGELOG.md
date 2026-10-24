@@ -4,6 +4,14 @@ All notable changes to this project will be documented in this file.
 
 The format is based on Keep a Changelog, and this project adheres to semantic versioning.
 
+## [0.5.0b1] - 2026-10-24
+
+### Added
+- Add a native MQTT lock entity per device with non-retained lock/unlock commands, reported state, and device/broker availability.
+
+### Fixed
+- Align state sensor labels with Nuki's MQTT state codes, including unlocking, unlocked, unlatched, unlatching, and motor blocked.
+
 ## [0.4.4] - 2026-10-24
 
 ### Fixed

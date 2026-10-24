@@ -1,7 +1,7 @@
 """Constants for the Nuki MQTT Events integration."""
 
 DOMAIN = "nuki_mqtt_events"
-PLATFORMS = ["sensor", "binary_sensor"]
+PLATFORMS = ["sensor", "binary_sensor", "lock"]
 
 CONF_TOPIC = "topic"
 CONF_AUTHORIZATION_NAMES = "authorization_names"

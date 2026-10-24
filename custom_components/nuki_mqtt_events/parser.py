@@ -8,14 +8,17 @@ from collections.abc import Mapping
 
 
 NukiStateNames = {
-    0: "unknown",
+    0: "uncalibrated",
     1: "locked",
-    2: "unlocked",
-    3: "unlatched",
+    2: "unlocking",
+    3: "unlocked",
     4: "locking",
-    5: "unlocking",
+    5: "unlatched",
     6: "unlocked_lock_n_go",
-    7: "unlatched_lock_n_go",
+    7: "unlatching",
+    253: "boot_run",
+    254: "motor_blocked",
+    255: "undefined",
 }
 
 NukiDeviceTypes = {
