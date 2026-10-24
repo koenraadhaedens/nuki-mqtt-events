@@ -38,6 +38,8 @@ Before installing the integration:
 8. Search for **Nuki MQTT Events** and complete the setup.
 
 The integration automatically subscribes to the Nuki MQTT namespace; no manual topic entry is required.
+Only one integration entry is allowed; it handles all Nuki devices. Adding it again
+is blocked to prevent duplicate MQTT subscriptions and entities.
 
 ## Supported MQTT message formats
 

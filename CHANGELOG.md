@@ -4,6 +4,11 @@ All notable changes to this project will be documented in this file.
 
 The format is based on Keep a Changelog, and this project adheres to semantic versioning.
 
+## [0.4.4] - 2026-10-24
+
+### Fixed
+- Prevent duplicate integration entries, including when an existing entry has no unique ID.
+
 ## [0.4.3] - 2026-10-14
 
 ### Changed

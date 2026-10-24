@@ -16,6 +16,9 @@ class NukiMqttEventsConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
 
     async def async_step_user(self, user_input=None) -> FlowResult:
         """Handle the initial step."""
+        if self._async_current_entries():
+            return self.async_abort(reason="already_configured")
+
         return self.async_create_entry(
             title="Nuki MQTT Events",
             data={CONF_TOPIC: DEFAULT_TOPIC},
