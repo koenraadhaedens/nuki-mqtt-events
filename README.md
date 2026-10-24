@@ -2,6 +2,10 @@
 
 Take local control of your Nuki devices with Nuki MQTT Events, a Home Assistant custom integration that lets you monitor your devices and lock or unlock supported locks over local MQTT, with no external API needed.
 
+You will still need the Nuki app to enable and configure MQTT on your device. Once configured, this integration communicates with your device locally over MQTT.
+
+Once the integration is set up, you can also control supported locks remotely through the Home Assistant Companion app, provided remote access to your Home Assistant instance is configured.
+
 It is designed to be installed and updated through the Home Assistant Community Store (HACS) as a custom repository.
 
 > [!NOTE]
