@@ -4,6 +4,11 @@ All notable changes to this project will be documented in this file.
 
 The format is based on Keep a Changelog, and this project adheres to semantic versioning.
 
+## [0.5.1] - 2026-10-24
+
+### Fixed
+- Rename the lock control to Lock/Unlock, including after device name updates.
+
 ## [0.5.0] - 2026-10-24
 
 ### Added

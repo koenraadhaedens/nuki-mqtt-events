@@ -117,7 +117,7 @@ An example configuration is available in [`examples/nuki_mqtt_events.yaml`](exam
 ## Lock and unlock control
 
 When a device publishes `state` on `nuki/<device-id>/state`, the integration
-creates a **Lock** entity on the same Home Assistant device as its sensors.
+creates a **Lock/Unlock** entity on the same Home Assistant device as its sensors.
 Complete payloads on `nuki/<device-id>` are also supported, provided the publisher
 accepts native Nuki commands on `nuki/<device-id>/lockAction`.
 Read-only bridges or publishers using a different command API are not supported

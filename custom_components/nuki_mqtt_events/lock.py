@@ -145,7 +145,7 @@ class NukiMqttLock(LockEntity):
         self.command_topic = command_topic
         self._broker_connected = broker_connected
         self._device_connected = True
-        self._attr_name = f"{label} Lock"
+        self._attr_name = f"{label} Lock/Unlock"
         self._attr_unique_id = f"{entry_id}_{device_key}_lock"
         self._attr_available = broker_connected
 
@@ -163,7 +163,7 @@ class NukiMqttLock(LockEntity):
         name = payload.get("name")
         if isinstance(name, str) and name.strip():
             self._device_label = name.strip()
-            self._attr_name = f"{self._device_label} Lock"
+            self._attr_name = f"{self._device_label} Lock/Unlock"
         connected = payload.get("connected")
         if isinstance(connected, bool):
             self._device_connected = connected

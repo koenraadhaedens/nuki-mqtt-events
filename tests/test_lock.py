@@ -116,8 +116,8 @@ class NukiLockTest(unittest.IsolatedAsyncioTestCase):
         frontdoor = await self.discover("DEF")
 
         self.assertEqual(len(self.entities), 2)
-        self.assertEqual(backdoor._attr_name, "Backdoor Lock")
-        self.assertEqual(frontdoor._attr_name, "DEF Lock")
+        self.assertEqual(backdoor._attr_name, "Backdoor Lock/Unlock")
+        self.assertEqual(frontdoor._attr_name, "DEF Lock/Unlock")
         self.assertEqual(backdoor._attr_unique_id, "entry_ABC_lock")
         self.assertEqual(
             backdoor.device_info["identifiers"],
@@ -128,7 +128,7 @@ class NukiLockTest(unittest.IsolatedAsyncioTestCase):
         await self.message("nuki/ABC/state", "3")
         await self.message("nuki/ABC/name", "Garden")
         self.assertEqual(len(self.entities), 2)
-        self.assertEqual(backdoor._attr_name, "Garden Lock")
+        self.assertEqual(backdoor._attr_name, "Garden Lock/Unlock")
         self.assertFalse(backdoor._attr_is_locked)
         self.assertTrue(frontdoor._attr_is_locked)
         self.platform.mqtt.async_publish.assert_not_awaited()
